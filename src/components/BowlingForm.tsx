@@ -1,75 +1,79 @@
 "use client";
 
-import { useState } from "react";
+import "./bowling-form.css";
+import { useEffect, useRef, useState, useTransition, type CSSProperties } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
-import {
-  DAYS,
-  EMPTY_FORM,
-  LANES,
-  RATINGS,
-  TIME_SLOTS,
-  type ComplaintForm,
-} from "@/lib/form-options";
+import { DAYS, EMPTY_FORM, RATINGS, TIME_SLOTS, type ComplaintForm } from "@/lib/form-options";
+import { submitReport } from "@/app/formulario/actions";
 import { Face } from "./Faces";
 
 const TOTAL_STEPS = 4;
-
+const STEP_NAMES = ["Pista", "Cuándo", "El problema", "Tu opinión"];
 const STEP_COPY = [
-  { title: "¿Qué pista falló?", subtitle: "Selecciona el número de la pista donde tuviste el problema." },
+  { title: "¿Qué pista falló?", subtitle: "Toca el carril donde tuviste el problema." },
   { title: "¿Cuándo ocurrió?", subtitle: "Dinos el día de la semana y el horario aproximado." },
   { title: "¿Qué problema tuviste?", subtitle: "Cuéntanos con detalle qué pasó con la pista." },
   { title: "¿Se solucionó tu problema?", subtitle: "Elige la carita que mejor describa tu experiencia." },
 ];
+const QUICK_IDEAS = [
+  "Los pinos no se acomodaron",
+  "La bola no regresó",
+  "La pista estaba resbalosa",
+  "El marcador no funcionó",
+  "La barrera no bajó",
+];
 
-function Pill({
-  selected,
-  onClick,
-  children,
-  className = "",
-}: {
-  selected: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-  className?: string;
-}) {
+function Defs() {
   return (
-    <motion.button
-      type="button"
-      whileTap={{ scale: 0.95 }}
-      onClick={onClick}
-      aria-pressed={selected}
-      className={`flex items-center justify-center gap-2 rounded-full border px-4 py-2.5 text-[15px] transition-colors ${
-        selected
-          ? "border-brand-ink bg-brand-yellow font-semibold text-brand-ink"
-          : "border-neutral-500 bg-white text-brand-ink hover:bg-brand-cream"
-      } ${className}`}
-    >
-      {selected && (
-        <motion.span
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-red"
-        >
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M2.5 6.5l2.2 2.2L9.5 3.8" stroke="#fff4e3" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </motion.span>
-      )}
-      {children}
-    </motion.button>
+    <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
+      <defs>
+        <g id="bf-pin">
+          <path
+            d="M30 2c-9 0-13 8-12 17 1 7 5 11 3 18-2 6-14 20-14 45 0 22 8 34 8 48 0 7 3 14 15 14s15-7 15-14c0-14 8-26 8-48 0-25-12-39-14-45-2-7 2-11 3-18 1-9-3-17-12-17z"
+            fill="#fff4e3"
+            stroke="#1a0d0d"
+            strokeWidth="3"
+          />
+          <path d="M19 42c8 4 14 4 22 0M17 52c9 4 17 4 26 0" stroke="#d4202b" strokeWidth="5" fill="none" />
+        </g>
+        <g id="bf-ball">
+          <circle cx="60" cy="60" r="58" fill="#241a3a" stroke="#1a0d0d" strokeWidth="3" />
+          <ellipse cx="40" cy="32" rx="16" ry="9" fill="#fff" opacity=".2" transform="rotate(-30 40 32)" />
+          <circle cx="62" cy="40" r="5" fill="#0d0710" />
+          <circle cx="78" cy="48" r="5" fill="#0d0710" />
+          <circle cx="68" cy="58" r="5" fill="#0d0710" />
+        </g>
+      </defs>
+    </svg>
   );
 }
 
-function Label({ children }: { children: React.ReactNode }) {
-  return <p className="mb-3 text-sm font-bold text-brand-ink">{children}</p>;
-}
+const Pin = () => (
+  <svg viewBox="0 0 60 160" aria-hidden="true">
+    <use href="#bf-pin" />
+  </svg>
+);
 
-export default function BowlingForm({ sede }: { sede: string }) {
+export default function BowlingForm({
+  sucursal,
+}: {
+  sucursal: { id: string; nombre: string; numPistas: number };
+}) {
+  const sede = sucursal.nombre;
+  const lanes = Array.from({ length: sucursal.numPistas }, (_, i) => i + 1);
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
-  const [form, setForm] = useState<ComplaintForm>({ ...EMPTY_FORM, sede });
+  const [form, setForm] = useState<ComplaintForm>(EMPTY_FORM);
   const [done, setDone] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+  const heading = useRef<HTMLHeadingElement>(null);
+  const mounted = useRef(false);
+
+  useEffect(() => {
+    if (mounted.current) heading.current?.focus({ preventScroll: true });
+    else mounted.current = true;
+  }, [step]);
 
   const set = <K extends keyof ComplaintForm>(key: K, value: ComplaintForm[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
@@ -77,208 +81,291 @@ export default function BowlingForm({ sede }: { sede: string }) {
   const canContinue = [
     form.lane !== null,
     form.day !== null && form.timeSlot !== null,
-    form.description.trim().length >= 5,
+    form.name.trim().length >= 2 && form.description.trim().length >= 5,
     form.rating !== null,
   ][step];
 
   const go = (delta: number) => {
     setDirection(delta);
+    setError(null);
     setStep((s) => s + delta);
   };
 
   const submit = () => {
-    // TODO: guardar en Supabase
-    console.log("Queja enviada:", form);
-    setDone(true);
+    setError(null);
+    startTransition(async () => {
+      const result = await submitReport(sucursal.id, form);
+      if (result.ok) setDone(true);
+      else setError(result.error);
+    });
   };
 
   const reset = () => {
-    setForm({ ...EMPTY_FORM, sede });
+    setForm(EMPTY_FORM);
     setStep(0);
     setDirection(1);
+    setError(null);
     setDone(false);
   };
 
+  const addIdea = (idea: string) => {
+    const current = form.description.trim().replace(/\.*$/, "");
+    set("description", (current ? `${current}. ${idea}` : idea).slice(0, 600));
+  };
+
+  const progress = step / (TOTAL_STEPS - 1);
+
   return (
-    <div className="w-full max-w-[560px] overflow-hidden rounded-[40px] border-2 border-brand-ink bg-brand-cream p-6 shadow-[8px_8px_0_0_#1a0d0d] sm:p-8">
-      {done ? (
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center py-10 text-center"
-        >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 260, damping: 16 }}
-            className="mb-5 flex h-16 w-16 items-center justify-center rounded-full border-2 border-brand-ink bg-brand-yellow"
-          >
-            <svg width="30" height="30" viewBox="0 0 12 12" fill="none">
-              <path d="M2.5 6.5l2.2 2.2L9.5 3.8" stroke="#1a0d0d" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </motion.div>
-          <h2 className="text-2xl font-bold tracking-tight">¡Gracias por avisarnos!</h2>
-          <p className="mt-2 max-w-xs text-neutral-800">
-            Registramos tu queja sobre la pista {form.lane} de {sede}. La revisaremos lo antes posible.
-          </p>
-          <button
-            onClick={reset}
-            className="mt-8 rounded-2xl border-2 border-brand-ink bg-white px-6 py-3 font-bold text-brand-ink transition-colors hover:bg-brand-yellow"
-          >
-            Enviar otra queja
-          </button>
-          <Link href="/" className="mt-4 text-sm font-semibold text-brand-red-dark underline underline-offset-4">
-            Volver al inicio
-          </Link>
-        </motion.div>
-      ) : (
-        <>
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-neutral-800">
-              Paso {step + 1}/{TOTAL_STEPS}
+    <div className="bf">
+      <Defs />
+      <div className="card">
+        {done ? (
+          <div className="done" role="status">
+            <div className="strike" aria-hidden="true">
+              <div className="arrows" />
+              {[1, 2, 3, 4, 5, 6].map((k) => (
+                <div key={k} className={`pin k${k}`}>
+                  <Pin />
+                </div>
+              ))}
+              <div className="ball-roll">
+                <svg viewBox="0 0 120 120">
+                  <use href="#bf-ball" />
+                </svg>
+              </div>
+            </div>
+            <p className="chuza">¡Chuza!</p>
+            <p className="thanks">
+              Registramos tu queja sobre la <b>pista {form.lane}</b> de {sede}, {form.name.trim().split(" ")[0]}. La
+              revisaremos lo antes posible.
             </p>
-            <span className="rounded-full bg-brand-red px-3 py-1 text-xs font-bold uppercase tracking-wide text-brand-cream">
-              {sede}
-            </span>
+            <button type="button" className="btn ghost" onClick={reset}>
+              Enviar otra queja
+            </button>
+            <Link href="/" className="change">
+              Volver al inicio
+            </Link>
           </div>
-          <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full border-2 border-brand-ink bg-white">
-            <motion.div
-              className="h-full rounded-full bg-brand-red"
-              animate={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }}
-              transition={{ type: "spring", stiffness: 140, damping: 20 }}
-            />
-          </div>
+        ) : (
+          <>
+            <div className="topbar">
+              <span className="logo">ilusion Bowl</span>
+              <span className="sede">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" />
+                  <circle cx="12" cy="9.5" r="2.4" />
+                </svg>
+                {sede}
+              </span>
+            </div>
 
-          <div className="relative mt-6 min-h-[420px]">
-            <AnimatePresence mode="wait" custom={direction}>
-              <motion.div
-                key={step}
-                custom={direction}
-                initial={{ opacity: 0, x: direction * 40 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: direction * -40 }}
-                transition={{ duration: 0.2 }}
-              >
-                <h1 className="text-3xl font-black tracking-tight text-brand-ink">{STEP_COPY[step].title}</h1>
-                <p className="mt-3 text-[17px] leading-snug text-neutral-700">{STEP_COPY[step].subtitle}</p>
+            <div className="track" style={{ "--p": progress } as CSSProperties} aria-hidden="true">
+              <div className="lane-line">
+                <div className="lane-fill" style={{ width: `${progress * 100}%` }} />
+              </div>
+              <div className="ball">
+                <svg viewBox="0 0 120 120">
+                  <use href="#bf-ball" />
+                </svg>
+              </div>
+              <div className="pinset">
+                <Pin />
+                <Pin />
+                <Pin />
+              </div>
+            </div>
+            <p className="step-label" aria-live="polite">
+              Paso {step + 1} de {TOTAL_STEPS} · {STEP_NAMES[step]}
+            </p>
 
-                <div className="mt-7">
-                  {step === 0 && (
-                    <>
-                      <Label>Número de pista:</Label>
-                      <div className="grid grid-cols-4 gap-2.5 sm:grid-cols-6">
-                        {LANES.map((n) => (
-                          <Pill key={n} selected={form.lane === n} onClick={() => set("lane", n)} className="!px-2">
-                            {n}
-                          </Pill>
+            <div className="stage">
+              <div key={step} className={`panel${direction < 0 ? " back" : ""}`}>
+                <h1 ref={heading} tabIndex={-1}>
+                  {STEP_COPY[step].title}
+                </h1>
+                <p className="sub">{STEP_COPY[step].subtitle}</p>
+
+                {step === 0 && (
+                  <div className="group">
+                    <p className="label">
+                      Número de pista <small>{lanes.length} pistas</small>
+                    </p>
+                    <div className="lanes" role="group" aria-label="Pistas">
+                      {lanes.map((n) => (
+                        <button
+                          key={n}
+                          type="button"
+                          className="lane"
+                          aria-pressed={form.lane === n}
+                          aria-label={`Pista ${n}`}
+                          onClick={() => set("lane", n)}
+                        >
+                          <span className="n">{n}</span>
+                        </button>
+                      ))}
+                    </div>
+                    <p className="hint">
+                      {form.lane ? (
+                        <>
+                          Elegiste la <b>pista {form.lane}</b>.
+                        </>
+                      ) : (
+                        "Aún no eliges ninguna pista."
+                      )}
+                    </p>
+                  </div>
+                )}
+
+                {step === 1 && (
+                  <>
+                    <div className="group">
+                      <p className="label">Día de la semana</p>
+                      <div className="days" role="group" aria-label="Día de la semana">
+                        {DAYS.map((d) => (
+                          <button
+                            key={d}
+                            type="button"
+                            className="chip"
+                            aria-pressed={form.day === d}
+                            aria-label={d}
+                            onClick={() => set("day", d)}
+                          >
+                            {d.slice(0, 3)}
+                          </button>
                         ))}
                       </div>
-                    </>
-                  )}
-
-                  {step === 1 && (
-                    <div className="space-y-6">
-                      <div>
-                        <Label>Día de la semana:</Label>
-                        <div className="flex flex-wrap gap-2.5">
-                          {DAYS.map((d) => (
-                            <Pill key={d} selected={form.day === d} onClick={() => set("day", d)}>
-                              {d}
-                            </Pill>
-                          ))}
-                        </div>
-                      </div>
-                      <div>
-                        <Label>Horario:</Label>
-                        <div className="grid grid-cols-2 gap-2.5">
-                          {TIME_SLOTS.map((t) => (
-                            <Pill
-                              key={t}
-                              selected={form.timeSlot === t}
-                              onClick={() => set("timeSlot", t)}
-                              className="!px-3 !text-sm"
-                            >
-                              {t}
-                            </Pill>
-                          ))}
-                        </div>
+                    </div>
+                    <div className="group">
+                      <p className="label">
+                        Horario <small>franjas de una hora</small>
+                      </p>
+                      <div className="times" role="group" aria-label="Horario">
+                        {TIME_SLOTS.map((t) => (
+                          <button
+                            key={t}
+                            type="button"
+                            className="chip"
+                            aria-pressed={form.timeSlot === t}
+                            onClick={() => set("timeSlot", t)}
+                          >
+                            {t}
+                          </button>
+                        ))}
                       </div>
                     </div>
-                  )}
+                  </>
+                )}
 
-                  {step === 2 && (
-                    <>
-                      <Label>Describe el problema:</Label>
+                {step === 2 && (
+                  <div className="group">
+                    <div className="field">
+                      <label className="label" htmlFor="bf-name">
+                        Tu nombre
+                      </label>
+                      <input
+                        id="bf-name"
+                        type="text"
+                        value={form.name}
+                        onChange={(e) => set("name", e.target.value)}
+                        maxLength={100}
+                        autoComplete="name"
+                        placeholder="Ej. María López"
+                      />
+                    </div>
+                    <div className="field">
+                      <label className="label" htmlFor="bf-desc">
+                        Describe el problema
+                      </label>
                       <textarea
+                        id="bf-desc"
                         value={form.description}
                         onChange={(e) => set("description", e.target.value)}
-                        rows={6}
+                        rows={5}
                         maxLength={600}
                         placeholder="Ej. Los pinos no se acomodaron después del segundo tiro..."
-                        className="w-full resize-none rounded-3xl border-2 border-brand-ink bg-white px-5 py-4 text-[16px] font-medium text-brand-ink outline-none transition-colors placeholder:font-normal placeholder:text-neutral-500 focus:border-brand-red focus:ring-4 focus:ring-brand-red/20"
                       />
-                      <p className="mt-2 text-right text-xs font-medium text-neutral-700">{form.description.length}/600</p>
-                    </>
-                  )}
+                      <p className="count">{form.description.length}/600</p>
+                      <div className="quick" aria-label="Ideas rápidas">
+                        {QUICK_IDEAS.map((idea) => (
+                          <button key={idea} type="button" onClick={() => addIdea(idea)}>
+                            + {idea}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-                  {step === 3 && (
-                    <div className="grid grid-cols-3 gap-3">
-                      {RATINGS.map((r) => {
-                        const selected = form.rating === r.value;
-                        return (
-                          <motion.button
+                {step === 3 && (
+                  <>
+                    <div className="group">
+                      <div className="faces" role="group" aria-label="Calificación">
+                        {RATINGS.map((r) => (
+                          <button
                             key={r.value}
                             type="button"
-                            whileHover={{ y: -3 }}
-                            whileTap={{ scale: 0.95 }}
+                            className="face"
+                            data-v={r.value}
+                            aria-pressed={form.rating === r.value}
                             onClick={() => set("rating", r.value)}
-                            aria-pressed={selected}
-                            className={`flex flex-col items-center gap-3 rounded-3xl border px-2 py-5 transition-colors ${
-                              selected ? "border-brand-ink bg-brand-yellow" : "border-neutral-500 bg-white hover:bg-brand-cream"
-                            }`}
                           >
-                            <motion.div animate={{ scale: selected ? 1.15 : 1, opacity: form.rating && !selected ? 0.45 : 1 }}>
-                              <Face type={r.value} />
-                            </motion.div>
-                            <span className="text-center text-sm font-bold leading-tight text-brand-ink">{r.label}</span>
-                          </motion.button>
-                        );
-                      })}
+                            <Face type={r.value} />
+                            <span>{r.label}</span>
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  )}
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          <div className="mt-4 flex items-center justify-between gap-2.5">
-            {step === 0 ? (
-              <Link href="/" className="text-sm font-bold text-brand-red-dark underline underline-offset-4">
-                ← Cambiar sede
-              </Link>
-            ) : (
-              <span />
-            )}
-            <div className="flex gap-2.5">
-            {step > 0 && (
-              <button
-                onClick={() => go(-1)}
-                className="rounded-2xl border-2 border-brand-ink bg-white px-8 py-4 font-bold text-brand-ink transition-colors hover:bg-brand-yellow"
-              >
-                Atrás
-              </button>
-            )}
-            <button
-              onClick={step === TOTAL_STEPS - 1 ? submit : () => go(1)}
-              disabled={!canContinue}
-              className="rounded-2xl border-2 border-brand-ink bg-brand-red px-8 py-4 font-bold text-brand-cream transition-all hover:bg-brand-red-dark disabled:cursor-not-allowed disabled:border-neutral-400 disabled:bg-neutral-300 disabled:text-neutral-600"
-            >
-              {step === TOTAL_STEPS - 1 ? "Enviar" : "Siguiente"}
-            </button>
+                    <div className="ticket">
+                      <h2>Resumen de tu reporte</h2>
+                      <dl>
+                        <dt>Sucursal</dt>
+                        <dd>{sede}</dd>
+                        <dt>Pista</dt>
+                        <dd>{form.lane}</dd>
+                        <dt>Cuándo</dt>
+                        <dd>
+                          {form.day}, {form.timeSlot}
+                        </dd>
+                        <dt>Nombre</dt>
+                        <dd>{form.name.trim()}</dd>
+                      </dl>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
-        </>
-      )}
+
+            {error && (
+              <p role="alert" className="err">
+                {error}
+              </p>
+            )}
+
+            <div className="nav">
+              {step === 0 && (
+                <Link href="/" className="change">
+                  ← Cambiar sede
+                </Link>
+              )}
+              <div className="actions">
+                {step > 0 && (
+                  <button type="button" className="btn ghost" onClick={() => go(-1)}>
+                    Atrás
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="btn primary"
+                  disabled={!canContinue || pending}
+                  onClick={step === TOTAL_STEPS - 1 ? submit : () => go(1)}
+                >
+                  {step === TOTAL_STEPS - 1 ? (pending ? "Enviando..." : "Enviar reporte") : "Siguiente"}
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

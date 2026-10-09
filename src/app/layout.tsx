@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Bowlby_One, Geist, Geist_Mono, Outfit } from "next/font/google";
 import Backdrop from "@/components/Backdrop";
 import "./globals.css";
 
@@ -13,6 +13,17 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const bowlby = Bowlby_One({
+  variable: "--font-bowlby",
+  weight: "400",
+  subsets: ["latin"],
+});
+
+const outfit = Outfit({
+  variable: "--font-outfit",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   title: "Quejas de pistas de boliche",
   description: "Formulario para reportar problemas con las pistas del boliche",
@@ -22,7 +33,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="es"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${bowlby.variable} ${outfit.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Backdrop />

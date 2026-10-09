@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { SEDES } from "@/lib/sedes";
 
-export default function Landing() {
+export default function Landing({ sedes }: { sedes: { slug: string; nombre: string }[] }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -41,7 +40,12 @@ export default function Landing() {
         ¿En qué sucursal fue?
       </p>
       <div className="grid gap-3 sm:grid-cols-2">
-        {SEDES.map((s, i) => (
+        {sedes.length === 0 && (
+          <p className="text-sm font-semibold text-neutral-800 sm:col-span-2">
+            Aún no hay sucursales disponibles. Vuelve pronto.
+          </p>
+        )}
+        {sedes.map((s, i) => (
           <motion.div
             key={s.slug}
             initial={{ opacity: 0, y: 12 }}
@@ -54,7 +58,7 @@ export default function Landing() {
               href={`/formulario/${s.slug}`}
               className="flex items-center justify-between rounded-2xl border-2 border-brand-ink bg-white px-5 py-4 text-lg font-bold text-brand-ink transition-colors hover:bg-brand-red hover:text-brand-cream"
             >
-              {s.name}
+              {s.nombre}
               <span aria-hidden className="text-xl">→</span>
             </Link>
           </motion.div>

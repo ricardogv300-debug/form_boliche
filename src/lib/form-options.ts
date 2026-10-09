@@ -1,5 +1,3 @@
-export const LANES = Array.from({ length: 24 }, (_, i) => i + 1);
-
 export const DAYS = [
   "Lunes",
   "Martes",
@@ -16,9 +14,9 @@ function formatHour(h: number) {
   return `${hour12}:00 ${suffix}`;
 }
 
-// Franjas de una hora, de 12:00 PM a 12:00 AM. Ajustar al horario real del boliche.
-export const TIME_SLOTS = Array.from({ length: 12 }, (_, i) => {
-  const start = 12 + i;
+// Franjas de una hora, de 11:00 AM a 1:00 AM (14 franjas). Ajustar al horario real del boliche.
+export const TIME_SLOTS = Array.from({ length: 14 }, (_, i) => {
+  const start = 11 + i;
   return `${formatHour(start)} - ${formatHour(start + 1)}`;
 });
 
@@ -31,19 +29,19 @@ export const RATINGS: { value: Rating; label: string }[] = [
 ];
 
 export type ComplaintForm = {
-  sede: string;
   lane: number | null;
   day: (typeof DAYS)[number] | null;
   timeSlot: string | null;
+  name: string;
   description: string;
   rating: Rating | null;
 };
 
 export const EMPTY_FORM: ComplaintForm = {
-  sede: "",
   lane: null,
   day: null,
   timeSlot: null,
+  name: "",
   description: "",
   rating: null,
 };

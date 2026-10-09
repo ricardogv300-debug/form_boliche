@@ -10,7 +10,7 @@ export function Face({ type, size = 56 }: { type: Rating; size?: number }) {
   const color = COLORS[type];
   return (
     <svg width={size} height={size} viewBox="0 0 48 48" fill="none" aria-hidden>
-      <circle cx="24" cy="24" r="22" fill={color} />
+      <circle cx="24" cy="24" r="22" fill={color} stroke="#1a0d0d" strokeWidth="2" />
       {type === "angry" && (
         <>
           <path d="M12 15l9 4M36 15l-9 4" stroke="#1a1a1a" strokeWidth="2.5" strokeLinecap="round" />
