@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { QRCodeSVG } from "qrcode.react";
 import "./qr-poster.css";
 import { Face } from "./Faces";
@@ -38,18 +37,8 @@ export default function QrPoster({ url, label }: { url: string; label: string })
           </div>
 
           <div className="p-foot">
-            <div>
-              <p className="p-hint">Hacemos tu juego ¡perfecto!</p>
-              <p className="p-url">{url.replace(/^https?:\/\//, "")}</p>
-            </div>
-            <Image
-              src="/logo-ilusion-bowl.png"
-              alt="Ilusion Bowl"
-              width={1294}
-              height={1398}
-              className="p-logo"
-              priority
-            />
+            <p className="p-hint">Ilusion Bowl · Hacemos tu juego ¡perfecto!</p>
+            <p className="p-url">{url.replace(/^https?:\/\//, "")}</p>
           </div>
         </div>
         <div className="checker" />

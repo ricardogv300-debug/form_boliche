@@ -37,7 +37,6 @@
     border: 3px solid var(--ink); border-radius: 18px; padding: 6px 14px; box-shadow: 3px 3px 0 var(--ink);
     font-family: var(--font-display); font-size: 19px; line-height: 1;
   }
-  .logo-img { height: 62px; width: auto; }
   .sede {
     display: inline-flex; align-items: center; gap: 7px; background: var(--yellow); border: 2px solid var(--ink);
     border-radius: 999px; padding: 6px 14px 6px 10px; font-weight: 700; font-size: 13px; letter-spacing: .06em; text-transform: uppercase;

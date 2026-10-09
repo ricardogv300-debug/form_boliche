@@ -96,11 +96,9 @@
   .p-faces svg { width: 8.6cqw; height: 8.6cqw; display: block; }
   .p-thanks { margin: 1.2cqw 0 0; font-size: 3.7cqw; font-weight: 800; }
 
-  .p-foot { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 4cqw; text-align: left; }
+  .p-foot { width: 100%; text-align: center; }
   .p-url { margin: 0; font-size: 2.7cqw; font-weight: 700; word-break: break-all; opacity: 0.95; }
-  .p-foot > div { min-width: 0; flex: 1; }
-  .p-foot .p-hint { margin: 0 0 0.8cqw; font-size: 3cqw; font-weight: 800; }
-  .p-logo { flex: none; width: 15cqw; height: auto; filter: drop-shadow(0 0.5cqw 0 rgba(0, 0, 0, 0.25)); }
+  .p-foot .p-hint { margin: 0 0 0.8cqw; font-size: 3.3cqw; font-weight: 800; }
 }
 
 /* Impresión: solo el cartel, sin nada del panel. El tamaño de hoja (@page) lo pone QrStudio según la opción elegida.

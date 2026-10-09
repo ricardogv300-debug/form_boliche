@@ -2,7 +2,6 @@
 
 import "./bowling-form.css";
 import { useEffect, useRef, useState, useTransition, type CSSProperties } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { DAYS, EMPTY_FORM, RATINGS, TIME_SLOTS, type ComplaintForm } from "@/lib/form-options";
 import { submitReport } from "@/app/formulario/actions";
@@ -150,7 +149,7 @@ export default function BowlingForm({
         ) : (
           <>
             <div className="topbar">
-              <Image src="/logo-ilusion-bowl.png" alt="Ilusion Bowl" width={1294} height={1398} className="logo-img" priority />
+              <span className="logo">ilusion Bowl</span>
               <span className="sede">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z" />
