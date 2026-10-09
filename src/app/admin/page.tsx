@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
+import DeleteReportButton from "@/components/DeleteReportButton";
+import ExportPdf from "@/components/ExportPdf";
 import { Face } from "@/components/Faces";
 import { RATINGS, type Rating } from "@/lib/form-options";
 import { requireAdmin } from "@/lib/supabase/require-admin";
@@ -55,6 +57,8 @@ async function Reports({ searchParams }: { searchParams: PageProps<"/admin">["se
         </div>
       </div>
 
+      <ExportPdf sucursales={sucursales ?? []} sucursalInicial={filter} />
+
       {error && (
         <p role="alert" className="mt-4 rounded-2xl border-2 border-brand-red-dark bg-white px-4 py-3 text-sm font-semibold text-brand-red-dark">
           No se pudieron cargar los reportes: {error.message}
@@ -73,12 +77,15 @@ async function Reports({ searchParams }: { searchParams: PageProps<"/admin">["se
               <th className="px-4 py-3">Cuándo ocurrió</th>
               <th className="px-4 py-3">Problema</th>
               <th className="px-4 py-3">¿Se solucionó?</th>
+              <th className="px-4 py-3">
+                <span className="sr-only">Acciones</span>
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-300">
             {reportes?.length === 0 && (
               <tr>
-                <td colSpan={8} className="px-4 py-10 text-center font-medium text-neutral-700">
+                <td colSpan={9}className="px-4 py-10 text-center font-medium text-neutral-700">
                   Todavía no hay reportes.
                 </td>
               </tr>
@@ -106,6 +113,9 @@ async function Reports({ searchParams }: { searchParams: PageProps<"/admin">["se
                       <Face type={r.calificacion as Rating} size={28} />
                       <span className="font-medium">{rating?.label}</span>
                     </div>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <DeleteReportButton id={r.id} who={r.nombre} />
                   </td>
                 </tr>
               );

@@ -8,7 +8,7 @@ async function Sucursales() {
   const { supabase } = await requireAdmin();
   const { data: sucursales } = await supabase
     .from("sucursales")
-    .select("id, nombre, slug, num_pistas, activa")
+    .select("id, nombre, slug, num_pistas, activa, reportes(count)")
     .order("created_at", { ascending: true });
 
   return (
@@ -23,7 +23,9 @@ async function Sucursales() {
       <NewSucursalForm />
 
       <ul className="space-y-3">
-        {sucursales?.map((s) => <SucursalRow key={s.id} sucursal={s} />)}
+        {sucursales?.map((s) => (
+          <SucursalRow key={s.id} sucursal={{ ...s, reportes: s.reportes[0]?.count ?? 0 }} />
+        ))}
         {sucursales?.length === 0 && <li className="font-medium text-neutral-700">Aún no hay sucursales.</li>}
       </ul>
     </section>

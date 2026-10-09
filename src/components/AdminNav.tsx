@@ -7,6 +7,7 @@ const LINKS = [
   { href: "/admin", label: "Reportes" },
   { href: "/admin/graficas", label: "Gráficas" },
   { href: "/admin/sucursales", label: "Sucursales" },
+  { href: "/admin/qr", label: "Código QR" },
 ];
 
 export default function AdminNav() {

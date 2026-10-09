@@ -61,7 +61,7 @@ export function NewSucursalForm() {
 export function SucursalRow({
   sucursal,
 }: {
-  sucursal: { id: string; nombre: string; slug: string; num_pistas: number; activa: boolean };
+  sucursal: { id: string; nombre: string; slug: string; num_pistas: number; activa: boolean; reportes: number };
 }) {
   const [state, action, pending] = useActionState<SucursalState, FormData>(updateSucursal, null);
   const [delState, delAction, deleting] = useActionState<SucursalState, FormData>(deleteSucursal, null);
@@ -103,12 +103,19 @@ export function SucursalRow({
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-neutral-300 pt-3">
         <p className="text-xs font-medium text-neutral-700">
           Enlace: <code>/formulario/{sucursal.slug}</code>
+          {" · "}
+          {sucursal.reportes} {sucursal.reportes === 1 ? "reporte" : "reportes"}
           {!sucursal.activa && " · oculta para el público"}
         </p>
         <form
           action={delAction}
           onSubmit={(e) => {
-            if (!confirm(`¿Borrar la sucursal "${sucursal.nombre}"? Esta acción no se puede deshacer.`)) e.preventDefault();
+            const reportes =
+              sucursal.reportes === 0
+                ? "No tiene reportes."
+                : `Se borrarán también sus ${sucursal.reportes} ${sucursal.reportes === 1 ? "reporte" : "reportes"}.`;
+            if (!confirm(`¿Borrar la sucursal "${sucursal.nombre}"? ${reportes} Esta acción no se puede deshacer.`))
+              e.preventDefault();
           }}
         >
           <input type="hidden" name="id" value={sucursal.id} />

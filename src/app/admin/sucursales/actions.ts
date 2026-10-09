@@ -65,17 +65,13 @@ export async function deleteSucursal(_: SucursalState, formData: FormData): Prom
   const { supabase } = await requireAdmin();
   const id = String(formData.get("id") ?? "");
 
+  // Los reportes de la sucursal se borran en cascada (ON DELETE CASCADE).
   const { data, error } = await supabase.from("sucursales").delete().eq("id", id).select("id");
-  if (error) {
-    return {
-      error:
-        error.code === "23503"
-          ? "Tiene reportes registrados; desactívala en lugar de borrarla."
-          : "No se pudo borrar la sucursal.",
-    };
-  }
+  if (error) return { error: "No se pudo borrar la sucursal." };
   if (!data?.length) return { error: "No se encontró la sucursal." };
 
   revalidatePath("/admin/sucursales");
+  revalidatePath("/admin");
+  revalidatePath("/admin/graficas");
   return { ok: true };
 }
