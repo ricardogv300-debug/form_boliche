@@ -24,9 +24,18 @@ const outfit = Outfit({
   subsets: ["latin"],
 });
 
+const title = "Ilusion Bowl | Reporta una falla en tu pista";
+const description = "¿Algo falló en tu pista? Cuéntanos qué pasó y lo revisamos. Solo toma un minuto.";
+
 export const metadata: Metadata = {
-  title: "Quejas de pistas de boliche",
-  description: "Formulario para reportar problemas con las pistas del boliche",
+  // Las imágenes de la vista previa necesitan una dirección absoluta. En Vercel se detecta sola;
+  // en otro servicio, define NEXT_PUBLIC_SITE_URL (por ejemplo https://tu-pagina.com).
+  metadataBase: process.env.NEXT_PUBLIC_SITE_URL ? new URL(process.env.NEXT_PUBLIC_SITE_URL) : undefined,
+  title,
+  description,
+  applicationName: "Ilusion Bowl",
+  openGraph: { title, description, siteName: "Ilusion Bowl", locale: "es_MX", type: "website" },
+  twitter: { card: "summary_large_image", title, description },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
