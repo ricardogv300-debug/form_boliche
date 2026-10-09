@@ -6,9 +6,12 @@ import { createClient } from "@/lib/supabase/server";
 async function LandingWithSedes() {
   await connection();
   const supabase = await createClient();
+  // Solo las activas, aunque haya una sesión de administrador abierta (que sí puede leer las ocultas):
+  // así el inicio se ve igual para todos.
   const { data } = await supabase
     .from("sucursales")
     .select("slug, nombre")
+    .eq("activa", true)
     .order("created_at", { ascending: true });
 
   return <Landing sedes={data ?? []} />;

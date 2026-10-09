@@ -12,6 +12,7 @@ async function SedeForm({ params }: { params: PageProps<"/formulario/[sede]">["p
     .from("sucursales")
     .select("id, nombre, num_pistas")
     .eq("slug", slug)
+    .eq("activa", true)
     .maybeSingle();
   if (!sucursal) notFound();
 
