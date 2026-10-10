@@ -16,11 +16,9 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const stamp = new Intl.DateTimeFormat("es-MX", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit", hour12: true, timeZone: "America/Mexico_City" });
 
 const AREAS = [
-  { key: "ambiente", label: "Ambiente y música" },
   { key: "limpieza", label: "Limpieza" },
   { key: "atencion", label: "Atención del personal" },
-  { key: "comida", label: "Comida y bebidas" },
-  { key: "pistas", label: "Las pistas" },
+  { key: "comida", label: "Comidas y bebidas" },
   { key: "precio", label: "Precio" },
 ] as const;
 const VISITAS: Record<string, string> = { familia: "En familia", amigos: "Con amigos", pareja: "En pareja", trabajo: "Evento de trabajo", cumpleanos: "Cumpleaños", otro: "Otro" };
@@ -151,6 +149,11 @@ async function Reviews({ searchParams }: { searchParams: PageProps<"/admin/resen
         </Link>
       </div>
 
+      <details className="detail">
+        <summary>
+          <span className="t-closed">Ver más detalle</span>
+          <span className="t-open">Ocultar detalle</span>
+        </summary>
       <div className="grid g-half" style={{ flex: "none" }}>
         <div className="card">
           <h2>Reseñas por estrellas</h2>
@@ -221,6 +224,8 @@ async function Reviews({ searchParams }: { searchParams: PageProps<"/admin/resen
           </div>
         </div>
       </div>
+
+      </details>
 
       <div className="card" style={{ marginTop: 14 }}>
         <h2>Más recientes</h2>

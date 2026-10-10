@@ -9,13 +9,11 @@ import { BallTrack, PublicCard, Strike } from "./PublicParts";
 const STAR = "m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.9-6.2-3.3-6.2 3.3L7 14.2 2 9.3l6.9-1z";
 const LABELS = ["", "Muy mala", "Mala", "Regular", "Buena", "Excelente"];
 
-type AreaKey = "ambiente" | "limpieza" | "atencion" | "comida" | "pistas" | "precio";
+type AreaKey = "limpieza" | "atencion" | "comida" | "precio";
 const AREAS: { key: AreaKey; label: string }[] = [
-  { key: "ambiente", label: "Ambiente y música" },
   { key: "limpieza", label: "Limpieza" },
   { key: "atencion", label: "Atención del personal" },
-  { key: "comida", label: "Comida y bebidas" },
-  { key: "pistas", label: "Las pistas" },
+  { key: "comida", label: "Comidas y bebidas" },
   { key: "precio", label: "Precio" },
 ];
 
@@ -61,7 +59,7 @@ export default function ReviewLugar({ sucursal, backHref }: { sucursal: { id: st
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
   const [general, setGeneral] = useState(0);
-  const [areas, setAreas] = useState<Record<AreaKey, number>>({ ambiente: 0, limpieza: 0, atencion: 0, comida: 0, pistas: 0, precio: 0 });
+  const [areas, setAreas] = useState<Record<AreaKey, number>>({ limpieza: 0, atencion: 0, comida: 0, precio: 0 });
   const [visita, setVisita] = useState("");
   const [recomienda, setRecomienda] = useState("");
   const [comentario, setComentario] = useState("");
@@ -86,6 +84,8 @@ export default function ReviewLugar({ sucursal, backHref }: { sucursal: { id: st
     setError(null);
     const input: ResenaInput = {
       calificacion: general,
+      ambiente: 0,
+      pistas: 0,
       ...areas,
       recomendaria: recomienda,
       visita,
@@ -107,7 +107,7 @@ export default function ReviewLugar({ sucursal, backHref }: { sucursal: { id: st
     setStep(0);
     setDirection(1);
     setGeneral(0);
-    setAreas({ ambiente: 0, limpieza: 0, atencion: 0, comida: 0, pistas: 0, precio: 0 });
+    setAreas({ limpieza: 0, atencion: 0, comida: 0, precio: 0 });
     setVisita("");
     setRecomienda("");
     setComentario("");

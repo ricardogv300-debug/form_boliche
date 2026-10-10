@@ -35,7 +35,7 @@ async function loadSummary() {
       .limit(1000),
     supabase
       .from("resenas_lugar")
-      .select("id, sucursal_id, calificacion, comida, pistas, comentario, created_at, sucursales(nombre)")
+      .select("id, sucursal_id, calificacion, limpieza, atencion, comida, precio, comentario, created_at, sucursales(nombre)")
       .order("created_at", { ascending: false })
       .limit(2000),
     supabase
@@ -69,9 +69,10 @@ async function loadSummary() {
 
   const num = (xs: (number | null)[]) => xs.filter((v): v is number => typeof v === "number");
   const areas = {
-    pistas: mean(num(res30.map((r) => r.pistas))),
-    meseros: mean(rm.filter((r) => age(r.created_at) <= 30 * DAY).map((r) => r.calificacion)),
+    limpieza: mean(num(res30.map((r) => r.limpieza))),
+    atencion: mean(num(res30.map((r) => r.atencion))),
     comida: mean(num(res30.map((r) => r.comida))),
+    precio: mean(num(res30.map((r) => r.precio))),
   };
 
   const abiertas = (tipo: string) => qs.filter((q) => q.tipo === tipo && (q.estado === "nueva" || q.estado === "en_revision"));
@@ -227,9 +228,10 @@ async function Summary() {
             <h3>Promedio por área</h3>
             <div className="mini">
               {[
-                ["Pistas", fmtArea(d.areas.pistas)],
-                ["Meseros", fmtArea(d.areas.meseros)],
+                ["Limpieza", fmtArea(d.areas.limpieza)],
+                ["Atención", fmtArea(d.areas.atencion)],
                 ["Comida", fmtArea(d.areas.comida)],
+                ["Precio", fmtArea(d.areas.precio)],
               ].map(([a, v]) => (
                 <div key={a}>
                   <b>{v}</b>
@@ -282,22 +284,6 @@ async function Summary() {
         </div>
 
         <div className="card d">
-          <h2>Pistas resueltas</h2>
-          <div className="prog">
-            <i style={{ width: `${pct}%` }} />
-          </div>
-          <div className="foot-meta">
-            <span>
-              <b>
-                <CountUp value={d.resueltos} />
-              </b>{" "}
-              resueltas
-            </span>
-            <span>de {d.total30} reportes en 30 días</span>
-          </div>
-        </div>
-
-        <div className="card f">
           <h2>Por sucursal</h2>
           <p className="hint">Calificación promedio, últimos 30 días</p>
           <div className="suc">
@@ -311,6 +297,26 @@ async function Summary() {
               </div>
             ))}
             {d.porSucursal.length === 0 && <span className="lbl">Aún no hay sucursales activas.</span>}
+          </div>
+          <div className="divider" style={{ flexDirection: "column", alignItems: "stretch", gap: 0 }}>
+            <div className="row between">
+              <span className="lbl" style={{ fontSize: 13 }}>
+                Pistas resueltas (30 días)
+              </span>
+              <b className="mono">{d.total30 ? `${pct}%` : "—"}</b>
+            </div>
+            <div className="prog" style={{ marginTop: 8 }}>
+              <i style={{ width: `${pct}%` }} />
+            </div>
+            <div className="foot-meta">
+              <span>
+                <b>
+                  <CountUp value={d.resueltos} />
+                </b>{" "}
+                resueltas
+              </span>
+              <span>de {d.total30} reportes</span>
+            </div>
           </div>
         </div>
 

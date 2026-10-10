@@ -181,6 +181,11 @@ async function Waiters({ searchParams }: { searchParams: PageProps<"/admin/meser
         </div>
       </div>
 
+      <details className="detail">
+        <summary>
+          <span className="t-closed">Ver más detalle</span>
+          <span className="t-open">Ocultar detalle</span>
+        </summary>
       <div className="grid g-half" style={{ flex: "none" }}>
         <div className="card">
           <h2>Reseñas por estrellas</h2>
@@ -217,6 +222,8 @@ async function Waiters({ searchParams }: { searchParams: PageProps<"/admin/meser
           </div>
         </div>
       </div>
+
+      </details>
 
       <MeserosPanel meseros={views} sucursales={sucursales ?? []} selected={selected} />
 
