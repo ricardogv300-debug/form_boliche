@@ -1,11 +1,11 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
 import { NewSucursalForm, SucursalRow } from "@/components/SucursalAdmin";
-import { requireAdmin } from "@/lib/supabase/require-admin";
+import { requireSuper } from "@/lib/supabase/require-admin";
 
 async function Sucursales() {
   await connection();
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireSuper();
   const { data: sucursales } = await supabase
     .from("sucursales")
     .select("id, nombre, slug, num_pistas, activa, reportes(count)")

@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/supabase/require-admin";
+import { requireSuper } from "@/lib/supabase/require-admin";
 
 export type SucursalState = { error?: string; ok?: boolean } | null;
 
@@ -20,7 +20,7 @@ function parsePistas(value: FormDataEntryValue | null) {
 }
 
 export async function createSucursal(_: SucursalState, formData: FormData): Promise<SucursalState> {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireSuper();
   const nombre = String(formData.get("nombre") ?? "").trim();
   const numPistas = parsePistas(formData.get("num_pistas"));
   const slug = slugify(nombre);
@@ -37,7 +37,7 @@ export async function createSucursal(_: SucursalState, formData: FormData): Prom
 }
 
 export async function updateSucursal(_: SucursalState, formData: FormData): Promise<SucursalState> {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireSuper();
   const id = String(formData.get("id") ?? "");
   const nombre = String(formData.get("nombre") ?? "").trim();
   const numPistas = parsePistas(formData.get("num_pistas"));
@@ -62,7 +62,7 @@ export async function updateSucursal(_: SucursalState, formData: FormData): Prom
 }
 
 export async function deleteSucursal(_: SucursalState, formData: FormData): Promise<SucursalState> {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requireSuper();
   const id = String(formData.get("id") ?? "");
 
   // Los reportes de la sucursal se borran en cascada (ON DELETE CASCADE).

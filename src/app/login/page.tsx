@@ -24,10 +24,14 @@ async function Login({ searchParams }: { searchParams: PageProps<"/login">["sear
 
 export default function LoginPage({ searchParams }: PageProps<"/login">) {
   return (
-    <main className="flex flex-1 items-center justify-center px-4 py-10">
-      <Suspense fallback={<p className="font-bold text-brand-cream">Cargando...</p>}>
-        <Login searchParams={searchParams} />
-      </Suspense>
-    </main>
+    <div className="adm login">
+      <div className="login-shell">
+        <main className="login-main">
+          <Suspense fallback={<p className="sub">Cargando...</p>}>
+            <Login searchParams={searchParams} />
+          </Suspense>
+        </main>
+      </div>
+    </div>
   );
 }

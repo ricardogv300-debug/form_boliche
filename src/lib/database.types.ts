@@ -13,10 +13,31 @@ export type Database = {
   };
   public: {
     Tables: {
+      admin_sucursales: {
+        Row: { created_at: string; sucursal_id: string; user_id: string };
+        Insert: { created_at?: string; sucursal_id: string; user_id: string };
+        Update: { created_at?: string; sucursal_id?: string; user_id?: string };
+        Relationships: [
+          {
+            foreignKeyName: "admin_sucursales_sucursal_id_fkey";
+            columns: ["sucursal_id"];
+            isOneToOne: false;
+            referencedRelation: "sucursales";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "admin_sucursales_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "admins";
+            referencedColumns: ["user_id"];
+          },
+        ];
+      };
       admins: {
-        Row: { created_at: string; user_id: string };
-        Insert: { created_at?: string; user_id: string };
-        Update: { created_at?: string; user_id?: string };
+        Row: { created_at: string; email: string | null; nombre: string | null; rol: string; user_id: string };
+        Insert: { created_at?: string; email?: string | null; nombre?: string | null; rol?: string; user_id: string };
+        Update: { created_at?: string; email?: string | null; nombre?: string | null; rol?: string; user_id?: string };
         Relationships: [];
       };
       meseros: {

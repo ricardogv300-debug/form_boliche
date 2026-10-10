@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type MouseEvent, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useSyncExternalStore, type MouseEvent, type ReactNode } from "react";
 import { MotionConfig, motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,23 +15,61 @@ const MAIN: Item[] = [
   { href: "/admin/pistas", label: "Pistas", icon: "pin" },
   { href: "/admin/resenas", label: "Reseñas", icon: "star" },
   { href: "/admin/meseros", label: "Meseros", icon: "user" },
-  { href: "/admin/comida", label: "Comida", icon: "food" },
   { href: "/admin/quejas", label: "Quejas y sugerencias", icon: "chat" },
 ];
 
 const EXTRA: Item[] = [
   { href: "/admin/graficas", label: "Gráficas", icon: "chart" },
-  { href: "/admin/sucursales", label: "Sucursales", icon: "store" },
   { href: "/admin/qr", label: "Código QR", icon: "qr" },
 ];
 
+const RailOpen = createContext(false);
+
+// Enlace de la barra lateral con el relevo animado del fondo activo. También lo usan las secciones que solo ve el super administrador.
+export function RailLink({ href, label, icon }: Item) {
+  const pathname = usePathname();
+  const open = useContext(RailOpen);
+  const on = href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
+  return (
+    <Link href={href} className="ibtn" aria-label={label} title={open ? undefined : label} aria-current={on ? "page" : undefined}>
+      {on && <motion.span layoutId="rail-pill" className="pillbg" transition={SPRING} />}
+      <span className="ico lab">
+        <Icon name={icon} />
+      </span>
+      <span className="txt lab">{label}</span>
+    </Link>
+  );
+}
+
 const THEME_KEY = "adm-theme";
+const RAIL_KEY = "adm-rail-open";
 const SPRING = { type: "spring", stiffness: 420, damping: 34 } as const;
 
-export default function AdminShell({ children, status, user }: { children: ReactNode; status: ReactNode; user: ReactNode }) {
+const railListeners = new Set<() => void>();
+const subscribeRail = (cb: () => void) => {
+  railListeners.add(cb);
+  return () => void railListeners.delete(cb);
+};
+const readRail = () => {
+  try {
+    return localStorage.getItem(RAIL_KEY) === "1";
+  } catch {
+    return false;
+  }
+};
+
+export default function AdminShell({ children, status, user, nav }: { children: ReactNode; status: ReactNode; user: ReactNode; nav: ReactNode }) {
   const pathname = usePathname();
   const root = useRef<HTMLDivElement>(null);
   const main = useRef<HTMLElement>(null);
+  // La barra lateral arranca compacta (solo iconos); el botón de arriba la despliega con nombres y se recuerda la elección.
+  const open = useSyncExternalStore(subscribeRail, readRail, () => false);
+  const toggleRail = () => {
+    try {
+      localStorage.setItem(RAIL_KEY, open ? "0" : "1");
+    } catch {}
+    railListeners.forEach((l) => l());
+  };
 
   // Tema: sin elección guardada se sigue al sistema (lo resuelve el CSS); al elegir uno se recuerda en este navegador.
   useEffect(() => {
@@ -84,77 +122,82 @@ export default function AdminShell({ children, status, user }: { children: React
     transition.finished.finally(() => html.classList.remove("adm-theming"));
   };
 
-  const isActive = (href: string) => (href === "/admin" ? pathname === "/admin" : pathname.startsWith(href));
-
   return (
     <MotionConfig reducedMotion="user">
+      <RailOpen.Provider value={open}>
       <div className="adm" ref={root}>
         <div className="shell">
-          <div className="top">
-            <Link href="/admin" className="brand">
-              <Image src="/logo-ilusion-bowl.png" alt="" width={40} height={44} priority />
-              <div>
-                Ilusion Bowl
-                <small>Panel de administración</small>
-              </div>
-            </Link>
-            <nav className="nav" aria-label="Secciones">
-              <div className="nav-in">
-                {MAIN.map((i) => {
-                  const on = isActive(i.href);
-                  return (
-                    <Link key={i.href} href={i.href} aria-current={on ? "page" : undefined}>
-                      {on && <motion.span layoutId="nav-pill" className="pillbg" transition={SPRING} />}
-                      <span className="lab">{i.label}</span>
-                    </Link>
-                  );
-                })}
-              </div>
-            </nav>
-            <div className="tools">
-              {status}
-              {user}
-            </div>
-          </div>
-
           <div className="shell-body">
-            <aside className="rail" aria-label="Accesos">
-              <div className="grp">
+            <aside className="rail" data-open={open} aria-label="Navegación">
+              <Link href="/admin" className="rail-brand" title={open ? undefined : "Ilusion Bowl"}>
+                <span className="ico">
+                  <Image src="/logo-ilusion-bowl.png" alt="" width={30} height={33} priority />
+                </span>
+                <span className="txt">
+                  <b>Ilusion Bowl</b>
+                  <small>Panel de administración</small>
+                </span>
+              </Link>
+
+              <button
+                type="button"
+                className="ibtn toggle"
+                aria-expanded={open}
+                aria-label={open ? "Contraer menú" : "Expandir menú"}
+                title={open ? undefined : "Expandir menú"}
+                onClick={toggleRail}
+              >
+                <span className="ico">
+                  <Icon name={open ? "left" : "menu"} />
+                </span>
+                <span className="txt">Contraer menú</span>
+              </button>
+
+              <div className="mid">
+                {[...MAIN, ...EXTRA].map((i) => (
+                  <RailLink key={i.href} {...i} />
+                ))}
+                {nav}
+              </div>
+
+              <div className="rail-foot">
+                {status}
+                {user}
                 <button
                   type="button"
                   className="ibtn theme-btn"
                   aria-label="Cambiar entre tema claro y oscuro"
-                  title="Cambiar tema"
+                  title={open ? undefined : "Cambiar tema"}
                   onClick={toggleTheme}
                 >
-                  <span className="sun">
-                    <Icon name="sun" />
+                  <span className="ico">
+                    <span className="sun">
+                      <Icon name="sun" />
+                    </span>
+                    <span className="moon">
+                      <Icon name="moon" />
+                    </span>
                   </span>
-                  <span className="moon">
-                    <Icon name="moon" />
-                  </span>
+                  <span className="txt">Cambiar tema</span>
                 </button>
+                <form action={logout}>
+                  <button type="submit" className="ibtn" aria-label="Cerrar sesión" title={open ? undefined : "Cerrar sesión"}>
+                    <span className="ico">
+                      <Icon name="out" />
+                    </span>
+                    <span className="txt">Cerrar sesión</span>
+                  </button>
+                </form>
               </div>
-              <div className="mid">
-                <div className="grp">
-                  {[...MAIN, ...EXTRA].map((i) => {
-                    const on = isActive(i.href);
-                    return (
-                      <Link key={i.href} href={i.href} className="ibtn" aria-label={i.label} title={i.label} aria-current={on ? "page" : undefined}>
-                        {on && <motion.span layoutId="rail-pill" className="pillbg" transition={SPRING} />}
-                        <span className="lab">
-                          <Icon name={i.icon} />
-                        </span>
-                      </Link>
-                    );
-                  })}
-                </div>
+              <div className="rail-credit" title="Servicio brindado por NioCat">
+                <span className="ico">
+                  <Image src="/logo-niocat.png" alt="" width={24} height={23} />
+                </span>
+                <span className="txt">
+                  <small>Servicio brindado por</small>
+                  <b>NioCat</b>
+                </span>
               </div>
-              <form action={logout} className="grp">
-                <button type="submit" className="ibtn" aria-label="Cerrar sesión" title="Cerrar sesión">
-                  <Icon name="out" />
-                </button>
-              </form>
             </aside>
 
             <main className="main" ref={main}>
@@ -163,6 +206,7 @@ export default function AdminShell({ children, status, user }: { children: React
           </div>
         </div>
       </div>
+      </RailOpen.Provider>
     </MotionConfig>
   );
 }
