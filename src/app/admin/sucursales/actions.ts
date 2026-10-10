@@ -72,6 +72,7 @@ export async function deleteSucursal(_: SucursalState, formData: FormData): Prom
 
   revalidatePath("/admin/sucursales");
   revalidatePath("/admin");
+  revalidatePath("/admin/pistas");
   revalidatePath("/admin/graficas");
   return { ok: true };
 }

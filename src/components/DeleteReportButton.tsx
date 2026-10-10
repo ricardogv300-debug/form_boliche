@@ -20,7 +20,7 @@ export default function DeleteReportButton({ id, who }: { id: string; who: strin
       onClick={onClick}
       disabled={pending}
       aria-label={`Borrar el reporte de ${who}`}
-      className="rounded-lg border-2 border-brand-ink bg-white px-2.5 py-1 text-xs font-bold text-brand-red-dark transition-colors hover:bg-brand-red hover:text-brand-cream disabled:opacity-50"
+      className="adm-del"
     >
       {pending ? "..." : "Borrar"}
     </button>

@@ -1,0 +1,219 @@
+/* Gafete del mesero con su código QR. Todo se mide en cqw para verse igual en pantalla y en papel. */
+.badge-sheet {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.badge-cell {
+  position: relative;
+}
+
+.badge-card {
+  --red: #d4202b;
+  --red-dark: #a8131d;
+  --deep: #5c0a10;
+  --cream: #fff4e3;
+  --ink: #1a0d0d;
+  --yellow: #f8bd2c;
+  --font-display: var(--font-bowlby), "Arial Black", Impact, sans-serif;
+  --font-body: var(--font-outfit), "Segoe UI", system-ui, sans-serif;
+
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  aspect-ratio: 3.5 / 4.6;
+  overflow: hidden;
+  background: var(--red);
+  color: var(--cream);
+  font-family: var(--font-body);
+  line-height: 1.2;
+  text-align: center;
+  border: 0.9cqw solid var(--ink);
+  border-radius: 6cqw;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+
+  .bd-checker {
+    flex: none;
+    align-self: stretch;
+    height: 4.4cqw;
+    background: conic-gradient(var(--red-dark) 25%, transparent 0 50%, var(--red-dark) 0 75%, transparent 0) 0 0 / 4.4cqw 4.4cqw;
+  }
+  .bd-inner {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2.4cqw 6cqw 2.6cqw;
+  }
+  .bd-brand {
+    padding: 0.8cqw 3.6cqw;
+    background: var(--cream);
+    color: var(--red);
+    border: 0.6cqw solid var(--ink);
+    border-radius: 99cqw;
+    font-family: var(--font-display);
+    font-size: 4.4cqw;
+    line-height: 1.1;
+    transform: rotate(-2deg);
+  }
+  .bd-who {
+    display: flex;
+    align-items: center;
+    gap: 3.4cqw;
+    width: 100%;
+    justify-content: center;
+    text-align: left;
+  }
+  .bd-photo {
+    flex: none;
+    width: 21cqw;
+    height: 21cqw;
+    border-radius: 50%;
+    border: 0.9cqw solid var(--ink);
+    background: var(--yellow);
+    object-fit: cover;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-display);
+    font-size: 8cqw;
+    color: var(--ink);
+  }
+  .bd-name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 6.4cqw;
+    line-height: 1.05;
+    color: var(--cream);
+    overflow-wrap: anywhere;
+    -webkit-text-stroke: 0.9cqw var(--deep);
+    paint-order: stroke fill;
+    text-shadow: 0.5cqw 0.6cqw 0 var(--deep);
+  }
+  .bd-role {
+    margin: 1cqw 0 0;
+    font-size: 3.4cqw;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.95;
+  }
+  .bd-qr {
+    width: 44cqw;
+    padding: 2.6cqw;
+    background: #fff;
+    border: 0.7cqw solid var(--ink);
+    border-radius: 4cqw;
+    box-shadow: 1.1cqw 1.1cqw 0 var(--deep);
+    line-height: 0;
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+  }
+  .bd-cta {
+    margin: 0;
+    font-size: 4.4cqw;
+    font-weight: 800;
+    line-height: 1.15;
+  }
+  .bd-where {
+    padding: 0.9cqw 4cqw;
+    background: var(--yellow);
+    color: var(--ink);
+    border: 0.6cqw solid var(--ink);
+    border-radius: 99cqw;
+    font-size: 3.4cqw;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+}
+
+/* Selector de pantalla (no se imprime) */
+.badge-pick {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 6px;
+  border-radius: 99px;
+  background: rgba(23, 18, 20, 0.82);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.badge-pick input {
+  width: 16px;
+  height: 16px;
+  accent-color: #d4202b;
+}
+.badge-cell.off .badge-card {
+  opacity: 0.35;
+  filter: grayscale(0.6);
+}
+
+/* Impresión: solo los gafetes, en hoja carta. Cada uno lleva una línea punteada para recortar. */
+@media print {
+  body:has(.badge-sheet) {
+    background: #fff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+  }
+  body:has(.badge-sheet) :not(.badge-sheet):not(.badge-sheet *):not(:has(.badge-sheet)) {
+    display: none !important;
+  }
+  body:has(.badge-sheet) :has(.badge-sheet) {
+    display: block !important;
+    position: static !important;
+    width: auto !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: none !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+  .badge-sheet {
+    display: grid !important;
+    justify-content: center;
+    padding: 0.5in !important;
+    gap: 0.2in !important;
+    width: auto !important;
+  }
+  .badge-sheet[data-size="grande"] {
+    grid-template-columns: repeat(2, 3.5in) !important;
+  }
+  .badge-sheet[data-size="chico"] {
+    grid-template-columns: repeat(3, 2.3in) !important;
+  }
+  .badge-cell {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    outline: 0.2mm dashed #9a9a9a;
+    outline-offset: 0.06in;
+  }
+  .badge-cell.off {
+    display: none !important;
+  }
+  .badge-pick {
+    display: none !important;
+  }
+}

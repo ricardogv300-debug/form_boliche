@@ -1,33 +1,56 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
-import QrStudio from "@/components/QrStudio";
+import QrTabs from "@/components/QrTabs";
+import { fotoUrl } from "@/lib/fotos";
 import { requireAdmin } from "@/lib/supabase/require-admin";
 
-async function Qr() {
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+async function Qr({ searchParams }: { searchParams: PageProps<"/admin/qr">["searchParams"] }) {
   await connection();
+  const sp = await searchParams;
   const { supabase } = await requireAdmin();
-  const { data } = await supabase
-    .from("sucursales")
-    .select("slug, nombre")
-    .order("created_at", { ascending: true });
+  const [{ data: sucursales }, { data: meseros }] = await Promise.all([
+    supabase.from("sucursales").select("id, slug, nombre").order("created_at", { ascending: true }),
+    supabase
+      .from("meseros")
+      .select("id, nombre, puesto, foto_path, sucursal_id")
+      .eq("activo", true)
+      .order("nombre", { ascending: true }),
+  ]);
+
+  const sucName = new Map((sucursales ?? []).map((s) => [s.id, s.nombre]));
+  const preselect = typeof sp.mesero === "string" && UUID.test(sp.mesero) ? sp.mesero : null;
 
   return (
-    <section className="space-y-5">
+    <div className="adm-page">
       <div>
-        <h1 className="text-3xl font-black tracking-tight text-brand-ink">Código QR</h1>
-        <p className="mt-1 text-neutral-700">
-          Cartel listo para imprimir. Al escanearlo, el cliente abre el formulario de queja desde su celular.
+        <h1>Código QR</h1>
+        <p className="sub">
+          Imprime el cartel de cada sucursal o el gafete de cada mesero. Con el QR del mesero, el cliente califica su atención sin tener que elegirlo.
         </p>
       </div>
-      <QrStudio sucursales={data ?? []} />
-    </section>
+      <QrTabs
+        sucursales={sucursales ?? []}
+        initialTab={sp.tab === "meseros" || preselect ? "meseros" : "cartel"}
+        preselect={preselect}
+        meseros={(meseros ?? []).map((m) => ({
+          id: m.id,
+          nombre: m.nombre,
+          puesto: m.puesto,
+          foto_url: fotoUrl(m.foto_path),
+          sucursal_id: m.sucursal_id,
+          sucursal: sucName.get(m.sucursal_id) ?? "",
+        }))}
+      />
+    </div>
   );
 }
 
-export default function AdminQrPage() {
+export default function AdminQrPage({ searchParams }: PageProps<"/admin/qr">) {
   return (
-    <Suspense fallback={<p className="font-semibold text-neutral-700">Cargando...</p>}>
-      <Qr />
+    <Suspense fallback={<p className="lbl">Cargando...</p>}>
+      <Qr searchParams={searchParams} />
     </Suspense>
   );
 }

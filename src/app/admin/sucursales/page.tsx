@@ -12,29 +12,31 @@ async function Sucursales() {
     .order("created_at", { ascending: true });
 
   return (
-    <section className="space-y-5">
+    <div className="adm-page">
       <div>
-        <h1 className="text-3xl font-black tracking-tight text-brand-ink">Sucursales</h1>
-        <p className="mt-1 text-neutral-700">
+        <h1>Sucursales</h1>
+        <p className="sub">
           El número de pistas de cada sucursal es el que verá la gente en el formulario.
         </p>
       </div>
 
-      <NewSucursalForm />
+      <div style={{ marginTop: 20 }}>
+        <NewSucursalForm />
+      </div>
 
-      <ul className="space-y-3">
+      <ul className="stack" style={{ padding: 0, margin: "14px 0 0" }}>
         {sucursales?.map((s) => (
           <SucursalRow key={s.id} sucursal={{ ...s, reportes: s.reportes[0]?.count ?? 0 }} />
         ))}
-        {sucursales?.length === 0 && <li className="font-medium text-neutral-700">Aún no hay sucursales.</li>}
+        {sucursales?.length === 0 && <li className="empty" style={{ listStyle: "none" }}>Aún no hay sucursales.</li>}
       </ul>
-    </section>
+    </div>
   );
 }
 
 export default function AdminSucursalesPage() {
   return (
-    <Suspense fallback={<p className="font-semibold text-neutral-700">Cargando...</p>}>
+    <Suspense fallback={<p className="lbl">Cargando...</p>}>
       <Sucursales />
     </Suspense>
   );

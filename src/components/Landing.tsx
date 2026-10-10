@@ -19,16 +19,15 @@ export default function Landing({ sedes }: { sedes: { slug: string; nombre: stri
       </div>
 
       <h1 className="text-center text-3xl font-black tracking-tight text-brand-ink sm:text-4xl">
-        ¿Algo falló en tu pista?
+        ¿Cómo estuvo tu visita?
       </h1>
       <p className="mt-4 text-center text-[17px] leading-relaxed text-neutral-800">
-        Este formulario sirve para reportar cualquier problema que hayas tenido con una pista de
-        boliche. Dinos qué pista fue, cuándo ocurrió y qué pasó, y el equipo lo revisará para
-        mejorar tu próxima partida. Solo toma un minuto.
+        Reporta una falla en tu pista, opina sobre la atención de un mesero o déjanos una queja o
+        sugerencia. El equipo lo revisa para mejorar tu próxima partida. Solo toma un minuto.
       </p>
 
       <ol className="mt-6 grid grid-cols-3 gap-2 text-center text-sm font-semibold text-brand-ink">
-        {["Elige tu sede", "Cuéntanos qué pasó", "Califica la solución"].map((t, i) => (
+        {["Elige tu sede", "Elige qué contarnos", "Envíalo"].map((t, i) => (
           <li key={t} className="rounded-2xl border-2 border-brand-ink bg-brand-yellow px-2 py-3 leading-tight">
             <span className="mb-1 block text-lg font-black">{i + 1}</span>
             {t}
@@ -55,7 +54,7 @@ export default function Landing({ sedes }: { sedes: { slug: string; nombre: stri
             whileTap={{ scale: 0.97 }}
           >
             <Link
-              href={`/formulario/${s.slug}`}
+              href={`/sucursal/${s.slug}`}
               className="flex items-center justify-between rounded-2xl border-2 border-brand-ink bg-white px-5 py-4 text-lg font-bold text-brand-ink transition-colors hover:bg-brand-red hover:text-brand-cream"
             >
               {s.nombre}

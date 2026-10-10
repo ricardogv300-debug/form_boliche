@@ -40,8 +40,6 @@ const slug = (s: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
-const inputClass =
-  "rounded-xl border-2 border-brand-ink bg-white px-3 py-2 text-[15px] font-medium text-brand-ink outline-none focus:border-brand-red focus:ring-4 focus:ring-brand-red/20";
 
 async function toDataUrl(url: string) {
   const blob = await (await fetch(url)).blob();
@@ -293,29 +291,28 @@ export default function ExportPdf({
     }
   }
 
-  const chip =
-    "rounded-full border-2 border-brand-ink bg-white px-3 py-1 text-xs font-bold text-brand-ink hover:bg-brand-yellow";
+  const chip = "chip";
 
   return (
-    <div className="mt-5 rounded-2xl border-2 border-brand-ink bg-white p-4">
-      <h2 className="text-lg font-black text-brand-ink">Descargar reporte</h2>
-      <p className="text-sm text-neutral-700">
+    <div className="card" style={{ marginTop: 14 }}>
+      <h2>Descargar reporte</h2>
+      <p className="hint">
         Elige el periodo y la sucursal. Si dejas las fechas vacías se incluye todo. El PDF es para imprimir y el Excel
         para trabajar los datos.
       </p>
 
-      <div className="mt-3 flex flex-wrap items-end gap-3">
-        <label className="text-sm font-bold text-brand-ink">
+      <div className="form-row" style={{ marginTop: 14 }}>
+        <label className="field">
           Desde
-          <input type="date" value={desde} onChange={(e) => setDesde(e.target.value)} className={`${inputClass} mt-1 block`} />
+          <input type="date" value={desde} onChange={(e) => setDesde(e.target.value)} className="input" />
         </label>
-        <label className="text-sm font-bold text-brand-ink">
+        <label className="field">
           Hasta
-          <input type="date" value={hasta} onChange={(e) => setHasta(e.target.value)} className={`${inputClass} mt-1 block`} />
+          <input type="date" value={hasta} onChange={(e) => setHasta(e.target.value)} className="input" />
         </label>
-        <label className="text-sm font-bold text-brand-ink">
+        <label className="field">
           Sucursal
-          <select value={sucursal} onChange={(e) => setSucursal(e.target.value)} className={`${inputClass} mt-1 block`}>
+          <select value={sucursal} onChange={(e) => setSucursal(e.target.value)} className="input">
             <option value="">Todas las sucursales</option>
             {sucursales.map((s) => (
               <option key={s.id} value={s.id}>
@@ -328,7 +325,7 @@ export default function ExportPdf({
           type="button"
           onClick={() => download("pdf")}
           disabled={busy !== null}
-          className="rounded-xl border-2 border-brand-ink bg-brand-red px-5 py-2.5 font-bold text-brand-cream shadow-[3px_3px_0_0_#1a0d0d] hover:bg-brand-red-dark disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-600 disabled:shadow-none"
+          className="btn accent"
         >
           {busy === "pdf" ? "Generando..." : "Descargar PDF"}
         </button>
@@ -336,14 +333,14 @@ export default function ExportPdf({
           type="button"
           onClick={() => download("xlsx")}
           disabled={busy !== null}
-          className="rounded-xl border-2 border-brand-ink bg-brand-yellow px-5 py-2.5 font-bold text-brand-ink shadow-[3px_3px_0_0_#1a0d0d] hover:bg-brand-yellow-dark disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-600 disabled:shadow-none"
+          className="btn dark"
         >
           {busy === "xlsx" ? "Generando..." : "Descargar Excel"}
         </button>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <span className="text-xs font-bold text-neutral-700">Atajos:</span>
+      <div className="row wrap" style={{ marginTop: 14, gap: 6 }}>
+        <span className="lbl" style={{ fontSize: 12 }}>Atajos:</span>
         <button type="button" className={chip} onClick={() => preset(1)}>Hoy</button>
         <button type="button" className={chip} onClick={() => preset(7)}>Últimos 7 días</button>
         <button type="button" className={chip} onClick={() => preset(30)}>Últimos 30 días</button>
@@ -352,7 +349,7 @@ export default function ExportPdf({
       </div>
 
       {msg && (
-        <p role="status" className={`mt-3 text-sm font-semibold ${msg.ok ? "text-green-800" : "text-brand-red-dark"}`}>
+        <p role="status" className={`msg ${msg.ok ? "ok" : "bad"}`}>
           {msg.text}
         </p>
       )}

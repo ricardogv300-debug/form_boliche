@@ -30,6 +30,9 @@ export default function LiveUpdates() {
       channel = supabase
         .channel("reportes-en-vivo")
         .on("postgres_changes", { event: "*", schema: "public", table: "reportes" }, refresh)
+        .on("postgres_changes", { event: "*", schema: "public", table: "quejas_sugerencias" }, refresh)
+        .on("postgres_changes", { event: "*", schema: "public", table: "resenas_meseros" }, refresh)
+        .on("postgres_changes", { event: "*", schema: "public", table: "resenas_lugar" }, refresh)
         .subscribe((s) => {
           if (cancelled) return;
           if (s === "SUBSCRIBED") setStatus("live");
@@ -45,15 +48,10 @@ export default function LiveUpdates() {
   }, [router]);
 
   const label = { connecting: "Conectando...", live: "En vivo", offline: "Sin conexión en vivo" }[status];
-  const dot = { connecting: "bg-brand-yellow", live: "bg-green-600", offline: "bg-brand-red" }[status];
 
   return (
-    <span
-      role="status"
-      title="Los reportes nuevos aparecen solos, sin recargar la página"
-      className="inline-flex items-center gap-2 rounded-full border-2 border-brand-ink bg-white px-3 py-1.5 text-sm font-bold text-brand-ink"
-    >
-      <span className={`h-2.5 w-2.5 rounded-full ${dot} ${status === "live" ? "animate-pulse" : ""}`} />
+    <span role="status" data-s={status} title="Los reportes nuevos aparecen solos, sin recargar la página" className="live">
+      <i />
       {label}
     </span>
   );

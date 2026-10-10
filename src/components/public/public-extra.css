@@ -1,0 +1,241 @@
+/* Piezas nuevas de los formularios públicos. Viven bajo .bf para usar las mismas variables del formulario de pistas. */
+.bf {
+  .hub {
+    display: grid;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .hub a {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 18px;
+    background: #fff;
+    border: 2px solid var(--ink);
+    border-radius: 22px;
+    color: var(--ink);
+    text-decoration: none;
+    transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+    animation: bf-slide-in 0.4s both;
+  }
+  .hub a:nth-child(2) { animation-delay: 0.07s; }
+  .hub a:nth-child(3) { animation-delay: 0.14s; }
+  .hub a:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 0 var(--ink);
+    background: var(--yellow);
+  }
+  .hub a:active { transform: translateY(0); box-shadow: none; }
+  .hub .ico {
+    flex: none;
+    width: 54px;
+    height: 54px;
+    display: grid;
+    place-items: center;
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    background: var(--red);
+    color: var(--cream);
+  }
+  .hub .ico svg { width: 28px; height: 28px; }
+  .hub b { display: block; font-size: 18px; font-weight: 800; line-height: 1.2; }
+  .hub .t { display: block; margin-top: 2px; font-size: 14px; color: var(--muted); }
+  .hub .go { margin-left: auto; font-size: 22px; font-weight: 800; }
+  .hub a.featured {
+    background: var(--yellow);
+    padding-block: 20px;
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .hub a.featured:hover { background: #ffd45e; }
+  .hub a.featured .t { color: var(--ink); opacity: 0.8; }
+  .tag-rec {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 9px;
+    border: 2px solid var(--ink);
+    border-radius: 99px;
+    background: var(--red);
+    color: var(--cream);
+    font-size: 11px;
+    font-style: normal;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    vertical-align: 2px;
+  }
+
+  /* Elegir mesero */
+  .waiters {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+    gap: 12px;
+  }
+  .waiter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 8px 12px;
+    background: #fff;
+    border: 2px solid var(--ink);
+    border-radius: 22px;
+    text-align: center;
+    transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  }
+  .waiter:hover { transform: translateY(-3px); box-shadow: 0 4px 0 var(--ink); }
+  .waiter[aria-pressed="true"] {
+    background: var(--yellow);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 0 var(--ink);
+  }
+  .waiter b { font-size: 15px; line-height: 1.15; font-weight: 800; }
+  .waiter small { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+  .pic {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    border: 2.5px solid var(--ink);
+    object-fit: cover;
+    background: var(--wood);
+    display: grid;
+    place-items: center;
+    font-family: var(--font-display);
+    font-size: 26px;
+    color: var(--ink);
+  }
+  .picked {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 18px;
+    padding: 12px 14px;
+    background: #fff;
+    border: 2px solid var(--ink);
+    border-radius: 20px;
+  }
+  .picked .pic { width: 56px; height: 56px; font-size: 20px; }
+  .picked b { display: block; font-size: 17px; font-weight: 800; }
+  .picked small { color: var(--muted); font-weight: 600; }
+
+  /* Estrellas */
+  .stars-pick {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 22px;
+  }
+  .star {
+    padding: 4px;
+    background: none;
+    border: 0;
+    transition: transform 0.15s;
+  }
+  .star svg {
+    width: clamp(44px, 12vw, 58px);
+    height: auto;
+    fill: #fff;
+    stroke: var(--ink);
+    stroke-width: 1.8;
+    stroke-linejoin: round;
+    transition: fill 0.15s, transform 0.25s cubic-bezier(0.3, 1.8, 0.5, 1);
+  }
+  .star.on svg { fill: var(--yellow); }
+  .star:hover { transform: translateY(-3px); }
+  .star.pop svg { transform: scale(1.25) rotate(-8deg); }
+  .rate-label {
+    margin: 12px 0 0;
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 24px;
+    min-height: 1.3em;
+  }
+
+  /* Queja o sugerencia */
+  .types {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .types button {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 14px 16px;
+    background: #fff;
+    border: 2px solid var(--ink);
+    border-radius: 20px;
+    text-align: left;
+    transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  }
+  .types button b { font-size: 17px; font-weight: 800; }
+  .types button small { font-size: 13px; color: var(--muted); font-weight: 600; }
+  .types button:hover { transform: translateY(-3px); box-shadow: 0 4px 0 var(--ink); }
+  .types button[aria-pressed="true"] {
+    background: var(--yellow);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 0 var(--ink);
+  }
+  input[type="text"].plain,
+  input[type="tel"].plain {
+    width: 100%;
+    background: #fff;
+    border: 2px solid var(--ink);
+    border-radius: 18px;
+    padding: 13px 18px;
+    font-size: 16px;
+    font-weight: 500;
+    outline: none;
+  }
+  input[type="text"].plain:focus { border-color: var(--red); box-shadow: 0 0 0 4px rgba(212, 32, 43, 0.2); }
+  .optional { font-weight: 600; color: var(--muted); font-size: 13px; }
+  .empty-note {
+    margin-top: 22px;
+    padding: 22px 18px;
+    background: #fff;
+    border: 2px dashed var(--ink);
+    border-radius: 20px;
+    text-align: center;
+    font-weight: 600;
+  }
+  .gone { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+  /* Reseña del lugar */
+  .visits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .area-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 18px;
+  }
+  .area-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 12px 8px 16px;
+    background: #fff;
+    border: 2px solid var(--ink);
+    border-radius: 18px;
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .stars-mini {
+    display: flex;
+    gap: 0;
+    flex: none;
+  }
+  .stars-mini .star { padding: 2px; }
+  .stars-mini .star svg { width: clamp(26px, 7.4vw, 32px); }
+  @media (max-width: 420px) {
+    .area-row { flex-direction: column; align-items: flex-start; gap: 2px; }
+  }
+
+  @media (max-width: 560px) {
+    .types { grid-template-columns: 1fr; }
+  }
+}

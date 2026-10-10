@@ -10,11 +10,11 @@ export default function QrPoster({ url, label }: { url: string; label: string })
         <div className="body">
           <div>
             <h2 className="p-title">
-              ¿Algo falló
+              ¿Cómo estuvo
               <br />
-              en tu pista?
+              tu visita?
             </h2>
-            <p className="p-sub">Escanea y cuéntanos qué pasó</p>
+            <p className="p-sub">Escanea y cuéntanos</p>
           </div>
 
           <div className="qr-tile">
@@ -23,8 +23,8 @@ export default function QrPoster({ url, label }: { url: string; label: string })
           <span className="p-label">{label}</span>
 
           <p className="p-desc">
-            Este código te lleva al <b>formulario para reportar fallas</b> en las pistas. Elige tu pista, dinos qué
-            pasó y tu reporte llega directo al equipo.
+            Con este código puedes <b>reportar una falla en tu pista</b>, <b>opinar de tu mesero</b> o dejarnos una{" "}
+            <b>queja o sugerencia</b>. Llega directo al equipo.
           </p>
 
           <div className="p-box">

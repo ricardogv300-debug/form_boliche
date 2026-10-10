@@ -11,6 +11,7 @@ export async function deleteReport(id: string): Promise<{ error?: string }> {
   if (!data?.length) return { error: "No se encontró el reporte." };
 
   revalidatePath("/admin");
+  revalidatePath("/admin/pistas");
   revalidatePath("/admin/graficas");
   return {};
 }

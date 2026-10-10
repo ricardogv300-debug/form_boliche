@@ -106,8 +106,8 @@
 @media print {
   html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; min-height: 0 !important; }
   /* Oculta todo lo que no sea el cartel ni un contenedor suyo, para que no ocupe espacio ni genere otra hoja */
-  body :not(.poster-print):not(.poster-print *):not(:has(.poster-print)) { display: none !important; }
-  body :has(.poster-print) {
+  body:has(.poster-print) :not(.poster-print):not(.poster-print *):not(:has(.poster-print)) { display: none !important; }
+  body:has(.poster-print) :has(.poster-print) {
     display: block !important; position: static !important; width: auto !important; max-width: none !important; min-height: 0 !important;
     margin: 0 !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; background: none !important;
   }

@@ -38,26 +38,22 @@ async function Charts({ searchParams }: { searchParams: PageProps<"/admin/grafic
   const stats = data as Stats | null;
 
   const href = (d: number, s?: string) => `/admin/graficas?dias=${d}${s ? `&sucursal=${s}` : ""}`;
-  const chip = (active: boolean) =>
-    `rounded-full border-2 border-brand-ink px-3 py-1.5 text-sm font-bold ${
-      active ? "bg-brand-ink text-brand-cream" : "bg-white text-brand-ink hover:bg-brand-yellow"
-    }`;
 
   const filters = (
-    <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-      <div className="flex flex-wrap gap-2">
+    <div className="filters">
+      <div className="chips">
         {RANGES.map((r) => (
-          <Link key={r} href={href(r, sucursal)} className={chip(r === dias)}>
+          <Link key={r} href={href(r, sucursal)} className="chip" aria-current={r === dias}>
             Últimos {r} días
           </Link>
         ))}
       </div>
-      <div className="flex flex-wrap gap-2">
-        <Link href={href(dias)} className={chip(!sucursal)}>
+      <div className="chips">
+        <Link href={href(dias)} className="chip" aria-current={!sucursal}>
           Todas las sucursales
         </Link>
         {sucursales?.map((s) => (
-          <Link key={s.id} href={href(dias, s.id)} className={chip(sucursal === s.id)}>
+          <Link key={s.id} href={href(dias, s.id)} className="chip" aria-current={sucursal === s.id}>
             {s.nombre}
           </Link>
         ))}
@@ -67,20 +63,20 @@ async function Charts({ searchParams }: { searchParams: PageProps<"/admin/grafic
 
   const header = (
     <div>
-      <h1 className="text-3xl font-black tracking-tight text-brand-ink">Gráficas</h1>
-      <p className="mt-1 text-neutral-700">Resumen de los reportes de los últimos {dias} días.</p>
+      <h1>Gráficas</h1>
+      <p className="sub">Resumen de los reportes de los últimos {dias} días.</p>
     </div>
   );
 
   if (error || !stats) {
     return (
-      <section className="space-y-5">
+      <div className="adm-page">
         {header}
         {filters}
-        <p role="alert" className="rounded-2xl border-2 border-brand-red-dark bg-white px-4 py-3 text-sm font-semibold text-brand-red-dark">
+        <p role="alert" className="banner">
           No se pudieron cargar las gráficas{error ? `: ${error.message}` : "."}
         </p>
-      </section>
+      </div>
     );
   }
 
@@ -106,11 +102,11 @@ async function Charts({ searchParams }: { searchParams: PageProps<"/admin/grafic
   ];
 
   return (
-    <section className="space-y-5">
+    <div className="adm-page">
       {header}
       {filters}
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid g-stat">
         <StatTile hero label="Reportes" value={String(stats.total)} detail={`en los últimos ${dias} días`} />
         <StatTile
           label="Problemas solucionados"
@@ -125,11 +121,11 @@ async function Charts({ searchParams }: { searchParams: PageProps<"/admin/grafic
       </div>
 
       {stats.total === 0 ? (
-        <p className="rounded-2xl border-2 border-brand-ink bg-white px-4 py-10 text-center font-medium text-neutral-700">
+        <p className="empty" style={{ marginTop: 14 }}>
           No hay reportes en este periodo. Prueba con un rango más amplio u otra sucursal.
         </p>
       ) : (
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid g-charts">
           <ChartCard title="Reportes por día" subtitle="Día de la semana en que ocurrió el problema" rows={porDia}>
             <ColumnChart data={porDia} />
           </ChartCard>
@@ -143,25 +139,25 @@ async function Charts({ searchParams }: { searchParams: PageProps<"/admin/grafic
             <BarList data={porHorario} labelWidth="w-44" />
           </ChartCard>
           <ChartCard
-            className="lg:col-span-2"
+            className="span2"
             title="Reportes por pista"
             subtitle={sucursal ? "Pistas de la sucursal seleccionada" : "Suma de todas las sucursales"}
             rows={porPista}
           >
             <ColumnChart data={porPista} labelEvery={porPista.length > 16 ? 2 : 1} />
           </ChartCard>
-          <ChartCard className="lg:col-span-2" title="Reportes por día del calendario" subtitle="Fecha en que se envió el reporte" rows={porFecha}>
+          <ChartCard className="span2" title="Reportes por día del calendario" subtitle="Fecha en que se envió el reporte" rows={porFecha}>
             <ColumnChart data={porFecha} labelEvery={dias === 7 ? 1 : dias === 30 ? 5 : 10} />
           </ChartCard>
         </div>
       )}
-    </section>
+    </div>
   );
 }
 
 export default function AdminChartsPage({ searchParams }: PageProps<"/admin/graficas">) {
   return (
-    <Suspense fallback={<p className="font-semibold text-neutral-700">Cargando...</p>}>
+    <Suspense fallback={<p className="lbl">Cargando...</p>}>
       <Charts searchParams={searchParams} />
     </Suspense>
   );
